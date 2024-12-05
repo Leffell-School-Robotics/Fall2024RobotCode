@@ -2,22 +2,22 @@ from vex import *
 
 #CONFIG
 
-brain=Brain()
-controller=Controller(PRIMARY)
+brain=Brain() #initialize the brain
+controller=Controller(PRIMARY) #initialize the controller
 
 ####### LIFT STUFF ↓ #######    
 
-lift = Motor(Ports.PORT5)
+lift = Motor(Ports.PORT5) #defines the lift motor
 
-lift.set_stopping(BrakeType.HOLD)
+lift.set_stopping(BrakeType.HOLD) #sets the lift motor to hold when not moving
 
-def on_up_button_pressed():
+def on_up_button_pressed():         #function for when the up button is pressed
     lift.spin(direction=REVERSE)
 
-def on_down_button_pressed():
+def on_down_button_pressed():      #function for when the down button is pressed    
     lift.spin(direction=FORWARD)
     
-def on_lift_button_released():
+def on_lift_button_released():     #function for when the lift button is released
     lift.stop()
 
 # controller event handlers
@@ -28,17 +28,17 @@ controller.buttonR2.released(on_lift_button_released)
 
 ####### CLAW CODE ↓ ########
 
-claw = Motor(Ports.PORT12)
+claw = Motor(Ports.PORT12) #defines the claw motor
 
-claw.set_stopping(BrakeType.HOLD)
+claw.set_stopping(BrakeType.HOLD) #sets the claw motor to hold when not moving
 
-def on_close_button_pressed():
+def on_close_button_pressed(): #function for when the close button is pressed
     claw.spin(direction=REVERSE)
 
-def on_open_button_pressed():
+def on_open_button_pressed(): # function for when the open button is pressed
     claw.spin(direction=FORWARD)
     
-def on_claw_button_released():
+def on_claw_button_released(): # function for when the claw button is released
     claw.stop()
 
 # controller event handlers
