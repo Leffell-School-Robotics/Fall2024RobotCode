@@ -37,7 +37,7 @@ controller.buttonL1.released(on_lift_button_released)
 claw = Motor(Ports.PORT12)
 
 claw.set_stopping(BrakeType.HOLD)
-claw.set_velocity(15, PERCENT)
+claw.set_velocity(17, PERCENT)
 
 
 def on_close_button_pressed():
