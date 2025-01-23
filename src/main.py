@@ -66,16 +66,25 @@ right_motor_b = Motor(Ports.PORT4, GearSetting.RATIO_18_1, True)
 right_drive_smart = MotorGroup(right_motor_a, right_motor_b)
 drivetrain = DriveTrain(left_drive_smart, right_drive_smart, 319.19, 355.59999999999997, 266.7, MM, 1)
 
+####### AUTONOMOUS SENSORS ↓ ########
+limit = Limit(brain.three_wire_port.a)
+limit.pressed(lambda: claw.reset_position())    
+    
 #varibles needed for the controoler loop
 drivetrain_l_needs_to_be_stopped_controller = False
 drivetrain_r_needs_to_be_stopped_controller = False
 
+currentValue = 1
 # define a task that will handle monitoring inputs from controller
 def rc_auto_loop_function_controller():
-    global drivetrain_l_needs_to_be_stopped_controller, drivetrain_r_needs_to_be_stopped_controller, remote_control_code_enabled
+    global drivetrain_l_needs_to_be_stopped_controller, drivetrain_r_needs_to_be_stopped_controller, remote_control_code_enabled, currentValue
     # process the controller input every 20 milliseconds
     # update the motors based on the input values
     while True:
+        if currentValue != claw.position():
+            brain.screen.print(claw.position())
+            brain.screen.next_row()
+            currentValue = claw.position()
         if remote_control_code_enabled:
             
             # calculate the drivetrain motor velocities from the controller joystick axies
