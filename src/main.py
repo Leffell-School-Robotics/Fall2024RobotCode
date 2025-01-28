@@ -8,23 +8,25 @@ controller=Controller(PRIMARY)
 ####### lift STUFF ↓ #######    
 
 lift1 = Motor(Ports.PORT5, GearSetting.RATIO_36_1)
-lift2 = Motor(Ports.PORT8, GearSetting.RATIO_36_1)
+lift2 = Motor(Ports.PORT8, GearSetting.RATIO_36_1, True)
+liftGroup = MotorGroup(lift1, lift2)
 
-lift1.set_stopping(BrakeType.HOLD)
-lift2.set_stopping(BrakeType.HOLD)
-
+liftGroup.set_stopping(BrakeType.HOLD)
 
 def on_up_button_pressed():
-    lift1.spin(direction=REVERSE)
-    lift2.spin(direction=FORWARD)
+    if lift1.position() < -560:
+        liftGroup.stop()
+    else:
+        liftGroup.spin(direction=REVERSE)
 
 def on_down_button_pressed():
-    lift1.spin(direction=FORWARD)
-    lift2.spin(direction=REVERSE)
+    if lift1.position() > 70:
+        liftGroup.stop()
+    else:
+        liftGroup.spin(direction=FORWARD)
     
 def on_lift_button_released():
-    lift1.stop()
-    lift2.stop()
+    liftGroup.stop()
 
 # controller event handlers
 controller.buttonR1.pressed(on_up_button_pressed)
@@ -67,8 +69,19 @@ right_drive_smart = MotorGroup(right_motor_a, right_motor_b)
 drivetrain = DriveTrain(left_drive_smart, right_drive_smart, 319.19, 355.59999999999997, 266.7, MM, 1)
 
 ####### AUTONOMOUS SENSORS ↓ ########
+def displayPosition():
+    brain.screen.print(liftGroup.position())
+    brain.screen.next_row()
+    
+def spinToClimbPosition():
+    liftGroup.spin_to_position(-313, DEGREES, 100, PERCENT)
+    drivetrain.drive_for(FORWARD, 400, MM, 100, PERCENT)
+    liftGroup.spin_to_position(18, DEGREES, 100, PERCENT)
+    
 limit = Limit(brain.three_wire_port.a)
-limit.pressed(lambda: claw.reset_position())    
+limit.pressed(lambda: liftGroup.reset_position())    
+controller.buttonX.pressed(displayPosition)
+controller.buttonA.pressed(spinToClimbPosition)
     
 #varibles needed for the controoler loop
 drivetrain_l_needs_to_be_stopped_controller = False
@@ -81,10 +94,6 @@ def rc_auto_loop_function_controller():
     # process the controller input every 20 milliseconds
     # update the motors based on the input values
     while True:
-        if currentValue != claw.position():
-            brain.screen.print(claw.position())
-            brain.screen.next_row()
-            currentValue = claw.position()
         if remote_control_code_enabled:
             
             # calculate the drivetrain motor velocities from the controller joystick axies
