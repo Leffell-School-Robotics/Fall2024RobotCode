@@ -68,29 +68,36 @@ right_motor_b = Motor(Ports.PORT4, GearSetting.RATIO_18_1, True)
 right_drive_smart = MotorGroup(right_motor_a, right_motor_b)
 drivetrain = DriveTrain(left_drive_smart, right_drive_smart, 319.19, 355.59999999999997, 266.7, MM, 1)
 
-####### AUTONOMOUS SENSORS ↓ ########
-def displayPosition():
-    brain.screen.print(liftGroup.position())
-    brain.screen.next_row()
-    
+####### AUTONOMOUS SENSORS ↓ ########  
 def spinToClimbPosition():
     liftGroup.spin_to_position(-313, DEGREES, 100, PERCENT)
     drivetrain.drive_for(FORWARD, 400, MM, 100, PERCENT)
     liftGroup.spin_to_position(18, DEGREES, 100, PERCENT)
     
+def rightAutonomous():
+    drivetrain.drive_for(FORWARD, 100, MM, 60, PERCENT)
+    liftGroup.spin_to_position(-540, DEGREES, 60, PERCENT)
+    drivetrain.drive_for(FORWARD, 600, MM, 60, PERCENT)
+    liftGroup.spin_to_position(-200, DEGREES, 100, PERCENT)
+    claw.spin_for(REVERSE, 10, DEGREES, 60, PERCENT)
+    drivetrain.turn_for(LEFT, 50, DEGREES, 60, PERCENT)
+    drivetrain.drive_for(FORWARD, 100, MM, 60, PERCENT)
+    liftGroup.spin_to_position(-300, DEGREES, 100, PERCENT)
+    drivetrain.drive_for(FORWARD, 800, MM, 60, PERCENT)
+    liftGroup.spin_to_position(18, DEGREES, 60, PERCENT)
+
 limit = Limit(brain.three_wire_port.a)
 limit.pressed(lambda: liftGroup.reset_position())    
-controller.buttonX.pressed(displayPosition)
 controller.buttonA.pressed(spinToClimbPosition)
+controller.buttonY.pressed(rightAutonomous)
     
 #varibles needed for the controoler loop
 drivetrain_l_needs_to_be_stopped_controller = False
 drivetrain_r_needs_to_be_stopped_controller = False
 
-currentValue = 1
 # define a task that will handle monitoring inputs from controller
 def rc_auto_loop_function_controller():
-    global drivetrain_l_needs_to_be_stopped_controller, drivetrain_r_needs_to_be_stopped_controller, remote_control_code_enabled, currentValue
+    global drivetrain_l_needs_to_be_stopped_controller, drivetrain_r_needs_to_be_stopped_controller, remote_control_code_enabled
     # process the controller input every 20 milliseconds
     # update the motors based on the input values
     while True:
